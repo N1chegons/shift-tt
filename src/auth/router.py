@@ -8,23 +8,19 @@ from src.auth.models import User
 from src.auth.schemas import UserRead, UserCreate
 
 router = APIRouter(
-    prefix="/user",
-    tags=["User"],
+    prefix="/auth",
+    tags=["User Authenticate"],
 )
 
-# conf fastapi_users
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
     [auth_backend],
 )
-
-
 cur_user = fastapi_users.current_user()
 
 router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix="/auth",
-    tags=["auth"],
+    prefix="/auth"
 )
 
 

@@ -11,7 +11,7 @@ from src.config import settings
 class Base(DeclarativeBase):
     pass
 
-DB_URL = "postgresql+asyncpg://postgres:1208@localhost:5432/postgres"
+DB_URL = settings.DB_URL
 async_engine = create_async_engine(url= DB_URL)
 async_session = async_sessionmaker(async_engine)
 
