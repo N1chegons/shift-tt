@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database import Base
 
 if TYPE_CHECKING:
-    from src.auth.models import User
+    from src.user.models import User
 
 class Slot(Base):
     __tablename__ = "slots"
