@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     DB_PASS: str
     DB_NAME: str
 
+    TEST_DATABASE_URL: str
+
     JWT_KEY: str
     MANAGER_PASS: str
 

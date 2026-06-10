@@ -20,7 +20,7 @@ class RoomRead(BaseModel):
 # BOOKING
 class BookingCreate(BaseModel):
     slot_id: int
-    date: datetime.date = Field(default=datetime.date.today(), description="Формат ГГГГ-ММ-ДД")
+    date: datetime.date = Field(default=datetime.date.today())
 
 class BookingRead(BaseModel):
     id: int

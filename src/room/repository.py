@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 
-from sqlalchemy import insert, select, delete, update
+from sqlalchemy import insert, select, delete
 from sqlalchemy.orm import selectinload
 
 from src.user.models import User
@@ -24,7 +24,7 @@ class SlotRepository:
         async with async_session() as session:
             query = select(Slot).filter_by(id=slot_id)
             result = await session.execute(query)
-            slot = result.one_or_none()
+            slot = result.scalar_one_or_none()
             return slot
 
     @classmethod
@@ -50,6 +50,14 @@ class BookingRepository:
             query = select(Booking)
             result = await session.execute(query)
             booking = result.all()
+            return booking
+
+    @classmethod
+    async def slot_is_free(cls, slot_id: int, date: datetime.date):
+        async with async_session() as session:
+            query = select(Booking).filter_by(slot_id=slot_id, date=date)
+            result = await session.execute(query)
+            booking = result.scalar_one_or_none()
             return booking
 
     @classmethod
@@ -211,12 +219,3 @@ class BookingRepository:
             await session.execute(stmt)
             await session.commit()
             return True
-
-    @classmethod
-    async def slot_is_free(cls, slot_id: int, date: datetime.date):
-        async with async_session() as session:
-            query = select(Booking).filter_by(slot_id=slot_id, date=date)
-            result = await session.execute(query)
-            booking = result.scalars().one_or_none()
-            return booking
-

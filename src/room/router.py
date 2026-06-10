@@ -31,10 +31,10 @@ async def get_rooms_list(user: User = Depends(cur_user)):
         logger.error(f"Error on receipt {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Неизвестная ошибка")
 
-@router.get("/get_rooms_slots/{rooms_id}", summary="Получение свободных слотов времени у определенной переговорной комнаты")
-async def get_free_slots(rooms_id: int, date: datetime.date = Query(default=datetime.date.today(), description="Формат ГГГГ-ММ-ДД"), user: User = Depends(cur_user)):
+@router.get("/get_rooms_slots/{room_id}", summary="Получение свободных слотов времени у определенной переговорной комнаты")
+async def get_free_slots(room_id: int, date: datetime.date = Query(default=datetime.date.today(), description="Формат ГГГГ-ММ-ДД"), user: User = Depends(cur_user)):
     try:
-        free_slots = await BookingRepository.get_bookings(rooms_id, date)
+        free_slots = await BookingRepository.get_bookings(room_id, date)
 
         if date < datetime.date.today():
             logger.warning("Date is less than today")
@@ -42,29 +42,29 @@ async def get_free_slots(rooms_id: int, date: datetime.date = Query(default=date
 
         if not free_slots:
             logger.warning("Rooms unfounded")
-            return {"detail": f"Нету свободных слотов времени к переговорной комнате {rooms_id}"}
+            return {"detail": f"Нету свободных слотов времени к переговорной комнате {room_id}"}
 
         logger.info(f"User {user.id} viewed free rooms")
-        return {"status": 200, "detail": f"Свободные слоты для переговорной комнаты номер {rooms_id} на {date}", "Slots": [SlotRead.model_validate(slot) for slot in free_slots]}
+        return {"status": 200, "detail": f"Свободные слоты для переговорной комнаты номер {room_id} на {date}", "Slots": [SlotRead.model_validate(slot) for slot in free_slots]}
 
     except Exception as e:
         logger.error(f"Error on receipt {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Неизвестная ошибка")
 
 @router.post("/to_book_room", summary="Забронировать переговорную комнаты")
-async def to_book_room(booked_schema: BookingCreate = Depends(), user: User = Depends(cur_user)):
+async def to_book_room(booked_schema: BookingCreate, user: User = Depends(cur_user)):
     try:
         free_slot = await BookingRepository.slot_is_free(booked_schema.slot_id, booked_schema.date)
         if free_slot:
             logger.warning(f"Room already booked for this time")
             return {"detail": f"Комната уже забронирована на это время"}
 
-        schema = booked_schema.model_dump()
-        booked_room = await BookingRepository.create_booking(schema, user.id)
-
-        if not booked_room:
+        if not free_slot:
             logger.warning(f"Slot {booked_schema.slot_id} unfounded")
             return {"details": f"Слот {booked_schema.slot_id} не найден"}
+
+        schema = booked_schema.model_dump()
+        booked_room = await BookingRepository.create_booking(schema, user.id)
 
         booked_details = await BookingRepository.get_booking_details(booked_room)
 
