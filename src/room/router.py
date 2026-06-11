@@ -59,12 +59,12 @@ async def to_book_room(booked_schema: BookingCreate, user: User = Depends(cur_us
             logger.warning(f"Room already booked for this time")
             return {"detail": f"Комната уже забронирована на это время"}
 
-        if not free_slot:
-            logger.warning(f"Slot {booked_schema.slot_id} unfounded")
-            return {"details": f"Слот {booked_schema.slot_id} не найден"}
-
         schema = booked_schema.model_dump()
         booked_room = await BookingRepository.create_booking(schema, user.id)
+
+        if not booked_room:
+            logger.warning(f"Slot {booked_schema.slot_id} unfounded")
+            return {"details": f"Слот {booked_schema.slot_id} не найден"}
 
         booked_details = await BookingRepository.get_booking_details(booked_room)
 

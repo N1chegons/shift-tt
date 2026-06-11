@@ -155,7 +155,7 @@ class BookingRepository:
                 query = query.filter(Booking.date == date)
 
             result = await session.execute(query)
-            bookings = result.all()
+            bookings = result.mappings().all()
 
             return bookings
 
@@ -176,10 +176,6 @@ class BookingRepository:
     @classmethod
     async def delete_booking(cls, user_id: int, booking_id: int):
         async with async_session() as session:
-            is_booking = await BookingRepository.is_booking(booking_id)
-            if not is_booking:
-                return False
-
             stmt = delete(Booking).filter_by(id=booking_id, user_id=user_id)
             await session.execute(stmt)
             await session.commit()

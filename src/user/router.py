@@ -70,9 +70,6 @@ async def get_reservations(user: User = Depends(cur_user)):
 async def delete_reservation(booking_id: int, user: User = Depends(cur_user)):
     try:
         del_reservation = await BookingRepository.delete_booking(user.id, booking_id)
-        if not del_reservation:
-            logger.warning(f"The reservation was not found")
-            return {"detail": f"Бронь с booking_id = {booking_id} не найдена"}
 
         logger.info(f"The user {user.id} cancelled the reservation with id={booking_id}")
         return {"status": 200, "message": f"Бронь {booking_id} отменена"}

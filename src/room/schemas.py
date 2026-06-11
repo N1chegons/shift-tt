@@ -24,9 +24,13 @@ class BookingCreate(BaseModel):
 
 class BookingRead(BaseModel):
     id: int
-    user: str
-    room: str
-    time: str
-    date: str
+    date: datetime.date
+    username: str
+    surname: str
     user_id: int
+    room_name: str
     room_id: int
+    start_time: str
+    end_time: str
+
+    model_config = ConfigDict(from_attributes=True)

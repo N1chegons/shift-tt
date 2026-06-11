@@ -40,10 +40,6 @@ async def get_all_reservations(page: int = 1, limit: int = 10, user: User = Depe
     try:
         all_reservations = await BookingRepository.get_bookings_for_admin(None, page, limit)
 
-        if not all_reservations:
-            logger.warning(f"The reservations was not found")
-            return {"detail": f"Нету активных броней"}
-
         logger.info(f"The admin {user.id} viewed all reservations")
         return {"status": 200, "detail": f"Все активные брони", "Reservations": [BookingRead.model_validate(room) for room in all_reservations]}
 
